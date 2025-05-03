@@ -1,0 +1,7 @@
+project1:
+   directory: ~/dev/project1
+   commands:
+    - xdg-open ~/dev/project1
+    - gnome-terminal -- bash -c "cd ~/dev/project1 && docker compose up; exec bash"
+    - code ~/dev/project1
+    - firefox http://localhost:3000
