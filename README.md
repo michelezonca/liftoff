@@ -20,7 +20,7 @@ Install `yq` on Ubuntu:
 sudo snap install yq
 # or
 sudo apt install yq
-
+```
 
 ## Usage
 ```
@@ -29,6 +29,11 @@ sudo apt install yq
 ```
 
 ## Configure your environments
+
+The script uses `workflows.yaml` by default for configuration. If a `workflows.local.yaml` file exists, it will override the default configuration, allowing you to maintain local customizations without modifying the main file.
+
+
+### Example workflows.local.yaml
 
 ```yaml
 project1:
