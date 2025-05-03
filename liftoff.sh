@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# Determine the directory of the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Use workflows.local.yaml if it exists, otherwise fallback to workflows.yaml
-if [ -f "workflows.local.yaml" ]; then
-  WORKFLOW_FILE="workflows.local.yaml"
+if [ -f "$SCRIPT_DIR/workflows.local.yaml" ]; then
+  WORKFLOW_FILE="$SCRIPT_DIR/workflows.local.yaml"
 else
-  WORKFLOW_FILE="workflows.yaml"
+  WORKFLOW_FILE="$SCRIPT_DIR/workflows.yaml"
 fi
 
 COMMAND=$1
@@ -12,7 +15,7 @@ COMMAND=$1
 # Function to list available projects
 list_projects() {
   echo "Available projects:"
-  yq e 'keys | .[]' "$WORKFLOW_FILE"
+  yq -r 'keys' "$WORKFLOW_FILE"
   exit 0
 }
 
@@ -27,15 +30,16 @@ if [ -z "$COMMAND" ]; then
 fi
 
 # Check if the project exists in the YAML file
-if ! yq e ".${COMMAND}" "$WORKFLOW_FILE" &>/dev/null; then
+if ! yq -e ".${COMMAND}" "$WORKFLOW_FILE" &>/dev/null; then
   echo "Unknown project: $COMMAND"
   echo "Use '$0 --list' to see available projects."
   exit 2
 fi
 
 # Extract directory and commands
-DIRECTORY=$(yq e ".${COMMAND}.directory" "$WORKFLOW_FILE")
-COMMANDS=$(yq e ".${COMMAND}.commands[]" "$WORKFLOW_FILE")
+DIRECTORY=$(yq -r ".${COMMAND}.directory" "$WORKFLOW_FILE")
+COMMANDS=$(yq -r ".${COMMAND}.commands[]" "$WORKFLOW_FILE")
+
 
 echo "Starting environment for $COMMAND..."
 
