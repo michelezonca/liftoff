@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Determine the directory of the script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# (resolving symlinks, so it works when linked e.g. into ~/.local/bin)
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 
 # Use workflows.local.yaml if it exists, otherwise fallback to workflows.yaml
 if [ -f "$SCRIPT_DIR/workflows.local.yaml" ]; then
@@ -31,6 +32,11 @@ case "$COMMAND" in
   --list|-l)
     echo "Available projects:"
     yq -r 'keys | .[]' "$WORKFLOW_FILE" | sed 's/^/  /'
+    exit 0
+    ;;
+  --names)
+    # Plain project list, used by shell completion
+    yq -r 'keys | .[]' "$WORKFLOW_FILE" 2>/dev/null
     exit 0
     ;;
   --help|-h)

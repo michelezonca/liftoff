@@ -23,6 +23,23 @@
 ./liftoff.sh --help           # Show usage
 ```
 
+## Shell completion
+
+Project names and options can be tab-completed. Make the script available as
+`liftoff` (alias or symlink) and source the completion file for your shell:
+
+```zsh
+# ~/.zshrc (after oh-my-zsh / compinit)
+alias liftoff=~/develop/liftoff/liftoff.sh
+source ~/develop/liftoff/completions/liftoff.zsh
+```
+
+```bash
+# ~/.bashrc
+alias liftoff=~/develop/liftoff/liftoff.sh
+source ~/develop/liftoff/completions/liftoff.bash
+```
+
 ## Configure your environments
 
 The script uses `workflows.yaml` by default for configuration. If a `workflows.local.yaml` file exists, it will override the default configuration, allowing you to maintain local customizations without modifying the main file.
