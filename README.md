@@ -21,6 +21,7 @@
 ./liftoff.sh <project-name>   # Launch a specific project
 ./liftoff.sh --list           # Show available projects
 ./liftoff.sh --help           # Show usage
+./liftoff.sh -q <project-name> # Launch without printing liftoff output
 ```
 
 ## Shell completion

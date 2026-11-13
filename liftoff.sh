@@ -12,7 +12,12 @@ else
 fi
 
 usage() {
-  echo "Usage: $0 <project_name> | --list | --help"
+  echo "Usage: $0 [--quiet] <project_name> | --list | --help"
+}
+
+# Print only when not in quiet mode
+log() {
+  [ "$QUIET" = 1 ] || echo "$@"
 }
 
 # yq is required (works with both mikefarah/yq v4 and the Python yq wrapper)
@@ -26,7 +31,15 @@ if [ ! -f "$WORKFLOW_FILE" ]; then
   exit 1
 fi
 
-COMMAND=$1
+# Parse arguments: -q/--quiet can appear before or after the project name
+QUIET=0
+COMMAND=""
+for arg in "$@"; do
+  case "$arg" in
+    --quiet|-q) QUIET=1 ;;
+    *) [ -z "$COMMAND" ] && COMMAND=$arg ;;
+  esac
+done
 
 case "$COMMAND" in
   --list|-l)
@@ -78,11 +91,11 @@ if [ -n "$DIRECTORY" ]; then
   fi
 fi
 
-echo "Starting environment for $COMMAND..."
+log "Starting environment for $COMMAND..."
 
 # Execute each command in the background
 while IFS= read -r cmd; do
   [ -z "$cmd" ] && continue
-  echo "Running: $cmd"
+  log "Running: $cmd"
   eval "$cmd" &
 done <<< "$COMMANDS"
