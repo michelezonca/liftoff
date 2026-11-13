@@ -12,26 +12,26 @@
 ## Requirements
 
 - Bash
-- [`yq`](https://github.com/mikefarah/yq) for parsing YAML
-
-Install `yq` on Ubuntu:
-
-```bash
-sudo snap install yq
-# or
-sudo apt install yq
-```
+- `yq` for parsing YAML. Both flavours are supported:
+  - [mikefarah/yq](https://github.com/mikefarah/yq) v4 (`sudo snap install yq`)
+  - the Python [kislyuk/yq](https://github.com/kislyuk/yq) wrapper around `jq` (`sudo apt install yq`)
 
 ## Usage
 ```
 ./liftoff.sh <project-name>   # Launch a specific project
 ./liftoff.sh --list           # Show available projects
+./liftoff.sh --help           # Show usage
 ```
 
 ## Configure your environments
 
 The script uses `workflows.yaml` by default for configuration. If a `workflows.local.yaml` file exists, it will override the default configuration, allowing you to maintain local customizations without modifying the main file.
 
+
+Each project has:
+
+- `directory` (optional): working directory the commands are run from (`~` is expanded)
+- `commands`: list of shell commands, each launched in the background
 
 ### Example workflows.local.yaml
 
