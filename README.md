@@ -49,7 +49,10 @@ The script uses `workflows.yaml` by default for configuration. If a `workflows.l
 Each project has:
 
 - `directory` (optional): working directory the commands are run from (`~` is expanded)
-- `commands`: list of shell commands, each launched in the background
+- `commands` (optional): list of shell commands, each launched in the background (in parallel)
+- `terminal` (optional): list of commands run **in sequence** inside a new [Ghostty](https://ghostty.org) window opened in the project directory. They are chained with `&&` (it stops at the first failure) and the window then stays open with your interactive `$SHELL`. Use `terminal: []` to just open the terminal.
+
+At least one of `commands` or `terminal` is required.
 
 ### Example workflows.local.yaml
 
@@ -61,4 +64,10 @@ project1:
     - gnome-terminal -- bash -c "cd ~/dev/project1 && docker compose up; exec bash"
     - code ~/dev/project1
     - firefox http://localhost:3000
+
+project2:
+   directory: ~/dev/project2
+   terminal:
+    - git pull
+    - claude
 ```

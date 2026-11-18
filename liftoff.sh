@@ -78,8 +78,16 @@ fi
 DIRECTORY=$(yq -r "$SELECTOR.directory // \"\"" "$WORKFLOW_FILE")
 COMMANDS=$(yq -r "($SELECTOR.commands // [])[]" "$WORKFLOW_FILE")
 
-if [ -z "$COMMANDS" ]; then
-  echo "No commands defined for project: $COMMAND" >&2
+# Optional "terminal" key: commands run in sequence inside a new terminal window
+# (an empty list just opens the terminal in the project directory)
+HAS_TERMINAL=0
+if [ "$(yq -r "$SELECTOR | has(\"terminal\")" "$WORKFLOW_FILE" 2>/dev/null)" = "true" ]; then
+  HAS_TERMINAL=1
+  TERMINAL_COMMANDS=$(yq -r "($SELECTOR.terminal // [])[]" "$WORKFLOW_FILE")
+fi
+
+if [ -z "$COMMANDS" ] && [ "$HAS_TERMINAL" = 0 ]; then
+  echo "No commands or terminal defined for project: $COMMAND" >&2
   exit 3
 fi
 
@@ -99,3 +107,22 @@ while IFS= read -r cmd; do
   log "Running: $cmd"
   eval "$cmd" &
 done <<< "$COMMANDS"
+
+# Open the terminal and run the "terminal" commands in sequence (stops at the
+# first failure); the window then stays open with an interactive shell
+if [ "$HAS_TERMINAL" = 1 ]; then
+  TERMINAL_SHELL=${SHELL:-/bin/bash}
+  SCRIPT=""
+  while IFS= read -r cmd; do
+    [ -z "$cmd" ] && continue
+    SCRIPT+="${SCRIPT:+ && }$cmd"
+  done <<< "$TERMINAL_COMMANDS"
+
+  if [ -n "$SCRIPT" ]; then
+    log "Opening terminal: $SCRIPT"
+    ghostty --working-directory="$PWD" -e "$TERMINAL_SHELL" -ic "$SCRIPT; exec \"$TERMINAL_SHELL\"" >/dev/null 2>&1 &
+  else
+    log "Opening terminal"
+    ghostty --working-directory="$PWD" >/dev/null 2>&1 &
+  fi
+fi
